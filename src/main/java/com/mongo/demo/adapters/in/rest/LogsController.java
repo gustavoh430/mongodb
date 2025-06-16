@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/logs")
 public class LogsController {
 
+    Logger log = Logger.getLogger(LogsController.class.getName());
 
     @Autowired
     private MongoDBRespository repository;
@@ -24,10 +26,9 @@ public class LogsController {
     public ResponseEntity<LogsDTO> createLog(@Valid @RequestBody LogsDTO logsDTO) {
 
         logsDTO.setTimestamp(LocalDateTime.now());
-
-        System.out.println(logsDTO);
-
-        return new ResponseEntity<>(repository.save(logsDTO), HttpStatus.CREATED);
+        LogsDTO response = repository.save(logsDTO);
+        log.info(response.toString());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
 
     }
 
@@ -36,7 +37,7 @@ public class LogsController {
     public ResponseEntity<ResultDTO> getLog(@PathVariable String serviceName) {
 
         ResultDTO resultDTO =  ResultDTO.builder().logs(repository.findByServiceName(serviceName)).build();
-
+        log.info(resultDTO.toString());
         return new ResponseEntity<>(resultDTO,HttpStatus.OK);
 
     }
